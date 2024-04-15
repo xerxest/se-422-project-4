@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+    <img class="logo" src="/logo.png">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <h1>Welcome, <%= user.username %>!</h1>
+   
+    <div class="forms-container">
+        <form action="/search-photos" method="GET">
+            <input type="text" name="query" placeholder="Search photos" required>
+            <button type="submit">Search</button>
+        </form>
+    
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            Upload a photo: <input type="file" name="photo" required><br>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+    
+    <div class="gallery-container">
+        <% if(user && photos) { %>
+            <% photos.forEach(function(photo) { %>
+                <div class="gallery-item">
+                    <img class ="gallery-image" src="/uploads/<%= user.username %>/<%= photo.filename%>" alt="Uploaded Photo" class="photoItem" style="max-width: 300px;">
+                    <figcaption><%= photo.filename %></figcaption>
+                </div>
+            <% }); %>
+          <% } %>    
+    </div>
+</body>
+</html>
