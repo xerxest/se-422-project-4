@@ -43,6 +43,7 @@ app.use(session({
     saveUninitialized: true
 }));
 
+
 app.set('view engine', 'ejs');
 
 
@@ -50,20 +51,17 @@ let users = [
     { username: "user1", password: "pass1", photos: [] }
 ];
 
-
 app.get('/', (req, res) => {
-    res.render('login');
+    res.render('login', { message: false });
 });
 
 app.post('/register', (req, res) => {
     const { username, password } = req.body;
     connection.getConnection((err, connection) => {
         if (err) {
-            console.error("Failed to connect to the database:", err);
             return;
         }
-        console.log("Successfully connected to the database.");
-    
+
         connection.query('SELECT 1 + 1 AS solution', (queryErr, results, fields) => {
             connection.release();
     
@@ -80,7 +78,7 @@ app.post('/register', (req, res) => {
         }
 
         if (results.length > 0) {
-            res.send('Username already taken. Please choose another.');
+            res.render('register', { message: "Username already taken. Please choose another" });
         } else {
             connection.execute('INSERT INTO users (username, password) VALUES (?, ?)', [username, password], (err, results) => {
                 if (err) throw err;
@@ -103,7 +101,7 @@ app.post('/login', (req, res) => {
             req.session.user = results[0];
             res.redirect('/profile');
         } else {
-            res.send('Login Failed');
+            res.render('login', { message: "Wrong username or password!" });
         }
     });
 });
@@ -124,7 +122,7 @@ app.get('/profile', (req, res) => {
     if (req.session.user) {
         connection.execute('SELECT filename FROM photos WHERE user_id = ?', [req.session.user.id], (err, results) => {
             if (err) throw err;
-            res.render('profile', { user: req.session.user, photos: results });
+            res.render('profile', { user: req.session.user, photos: results, filter: false });
         });
     } else {
         res.redirect('/');
@@ -148,16 +146,16 @@ app.get('/search-photos', (req, res) => {
         }
 
         if (results.length > 0) {
-            res.render('profile', { user: req.session.user, photos: results});
+            res.render('profile', { user: req.session.user, photos: results, filter: searchQuery });
         } else {
-            res.render('profile', { user: req.session.user, photos: [], message: 'No photos found.' });
+            res.render('profile', { user: req.session.user, photos: [], filter: 'No photos found.' });
         }
     });
 });
 
 
 app.get('/register', (req, res) => {
-    res.render('register');
+    res.render('register', { message: false });
 });
   
 app.listen(PORT, () => {

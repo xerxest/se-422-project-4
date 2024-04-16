@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <h1>Welcome, <%= user.username %>!</h1>
+    <h1>Welcome, <%= user.username %></h1>
    
     <div class="forms-container">
         <form action="/search-photos" method="GET">
@@ -20,12 +20,17 @@
             <button type="submit">Upload</button>
         </form>
     </div>
+
+    <% if(filter) { %>
+        <h3>filter by:<%= filter %></h3>
+    <%}%>
     
     <div class="gallery-container">
         <% if(user && photos) { %>
             <% photos.forEach(function(photo) { %>
                 <div class="gallery-item">
                     <img class ="gallery-image" src="/uploads/<%= user.username %>/<%= photo.filename%>" alt="Uploaded Photo" class="photoItem" style="max-width: 300px;">
+                    <a href="/uploads/<%= user.username %>/<%= photo.filename %>" download="<%= photo.filename %>" class="download-button">Download</a>
                     <figcaption><%= photo.filename %></figcaption>
                 </div>
             <% }); %>
